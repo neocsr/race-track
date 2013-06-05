@@ -7,4 +7,5 @@ Motion::Project::App.setup do |app|
   app.name = 'Race Track'
   app.deployment_target = '5.0'
   app.frameworks += %w(QuartzCore)
+  app.icons = ['Icon.png', 'Icon@2x.png']
 end

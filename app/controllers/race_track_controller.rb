@@ -1,6 +1,9 @@
 class RaceTrackController < UIViewController
 
+  attr_accessor :carView
+
   def viewDidLoad
+    self.view.userInteractionEnabled = true
     self.view.backgroundColor = UIColor.orangeColor
 
     trackPath = UIBezierPath.bezierPath
@@ -38,21 +41,46 @@ class RaceTrackController < UIViewController
     centerLine.lineWidth = 2.0
     self.view.layer.addSublayer(centerLine)
 
-    car = CALayer.layer
-    car.bounds = CGRectMake(0, 0, 44.0, 20.0)
-    car.position = p(160, 25)
-    car.contents = UIImage.imageNamed("carmodel.png").CGImage
-    self.view.layer.addSublayer(car)
-
-    anim = CAKeyframeAnimation.animationWithKeyPath("position")
-    anim.path = trackPath.CGPath
-    anim.rotationMode = KCAAnimationRotateAuto
-    anim.repeatCount = 10
-    anim.duration = 8.0
-    car.addAnimation(anim, forKey: "race")
+    self.carView = CarView.create
+    self.view.addSubview(carView)
   end
 
   def p(x, y)
     CGPoint.new(x, y)
+  end
+
+  def touchesBegan(touches, withEvent: event)
+    # We only support single touches, so anyObject retrieves just that touch from touches
+    touch = touches.anyObject
+
+    # Only move the placard view if the touch was in the placard view
+    if touch.view == carView
+      # Animate the first touch
+      # animateFirstTouchAtPoint(touch.locationInView(self))
+    else
+      # In case of a double tap outside the placard view, update the placard's display string
+      # carView.setupNextDisplayString if touch.tapCount == 2
+    end
+  end
+
+  def touchesMoved(touches, withEvent: event)
+    touch = touches.anyObject
+
+    # If the touch was in the carView, move the carView to its location
+    if touch.view == carView
+      location = touch.locationInView(self.view)
+      carView.center = location
+    end
+  end
+
+  def touchesEnded(touches, withEvent: event)
+    touch = touches.anyObject
+
+    # If the touch was in the carView, bounce it back to the center
+    if touch.view == carView
+      # Disable user interaction so subsequent touches don't interfere with animation
+      # self.userInteractionEnabled = false
+      # animatePlacardViewToCenter
+    end
   end
 end
